@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  customer1-nginx-service
+  namespace: heartbeat
+spec:
+  replicas: 3 
+  selector:
+    matchLabels:
+      run : efm_heartbeating_nginx
+  template:
+    metadata:
+      labels:
+        run : efm_heartbeating_nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        volumeMounts:
+        - name: config-volume-nginx
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: config-volume-nginx
+        configMap:
+          name:  customer1-nginx-heartbeat
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name:  customer1-spark
+  namespace: heartbeat
+spec:
+  containers:
+  - name: minifi-spark
+    image: apache/nifi-minifi:latest
+    volumeMounts:
+    - name: config-volume-spark
+      mountPath: opt/minifi/minifi-1.21.0/conf/bootstrap.conf
+      subPath: bootstrap.conf
+    ports:
+    - containerPort: 8083
+  volumes:
+    - name: config-volume-spark
+      configMap:
+        name:  customer1-minifi-agent-spark
+  hostAliases:
+  - ip: "192.168.49.2"
+    hostnames:
+    - "heartbeatingefm.com"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name:  customer1-hive
+  namespace: heartbeat
+spec:
+  containers:
+  - name: minifi-hive
+    image: apache/nifi-minifi:latest
+    volumeMounts:
+    - name: config-volume-hive
+      mountPath: opt/minifi/minifi-1.21.0/conf/bootstrap.conf
+      subPath: bootstrap.conf
+    ports:
+    - containerPort: 8083
+  volumes:
+    - name: config-volume-hive
+      configMap:
+        name:  customer1-minifi-agent-hive
+  hostAliases:
+  - ip: "192.168.49.2"
+    hostnames:
+    - "heartbeatingefm.com"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name:  customer1-yarn
+  namespace: heartbeat
+spec:
+  containers:
+  - name: minifi-yarn
+    image: apache/nifi-minifi:latest
+    volumeMounts:
+    - name: config-volume-yarn
+      mountPath: opt/minifi/minifi-1.21.0/conf/bootstrap.conf
+      subPath: bootstrap.conf
+    ports:
+    - containerPort: 8083
+  volumes:
+    - name: config-volume-yarn
+      configMap:
+        name:  customer1-minifi-agent-yarn
+  hostAliases:
+  - ip: "192.168.49.2"
+    hostnames:
+    - "heartbeatingefm.com"

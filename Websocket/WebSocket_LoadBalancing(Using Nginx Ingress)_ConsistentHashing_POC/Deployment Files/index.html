@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Heartbeat Example</title>
+</head>
+<body onload="connect()">
+<h1>WebSocket Heartbeat Example</h1>
+<div id="messages"></div>
+
+<script>
+
+<!--        const id = '6543211234567890';-->
+        const socket = new WebSocket('ws://websocketpoc.com/ws?id=6543211234567890');    //Change the id or replicate this HTML file and change the id and Check the connection in Websocket Server.
+                                                                                         //If the WebSocket is hosted on a URL with http, you should use ws as the protocol.
+                                                                                         //If the WebSocket is hosted on a URL with https, you should use wss as the protocol.
+        console.log("WebSocket Query Parameter Added");
+
+        socket.onopen = () => {
+          console.log("WebSocket connection established.");
+        };
+
+        socket.onclose = () => {
+          console.log("WebSocket connection closed.");
+        };
+
+        socket.onerror = (error) => {
+          console.error("WebSocket error:", error);
+        };
+
+        function sendMessage(message) {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(message);
+          } else {
+            console.error("WebSocket connection is not open.");
+          }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  websocket-service
+spec:
+  replicas: 3 
+  selector:
+    matchLabels:
+      run : websocket
+  template:
+    metadata:
+      labels:
+        run : websocket
+    spec:
+      containers:
+      - name: websocketpoc
+        image: shreymavani/springapp-poc
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-service
+spec:
+  type: ClusterIP
+  ports: 
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    name : https
+  selector:
+    run : websocket

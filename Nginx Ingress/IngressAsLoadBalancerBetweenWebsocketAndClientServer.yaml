@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$arg_id"  #nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr" specifies the method to use for load balancing requests to the upstream servers. In this case, the Nginx ingress controller will use the client's IP address ($remote_addr) to calculate a hash value, which is used to determine which upstream server should receive the request. This is known as IP Hash load balancing.
+    # nginx.ingress.kubernetes.io/upstream-hash-by-subset: true #nginx.ingress.kubernetes.io/upstream-hash-by-subset: $request_uri specifies an additional parameter to use in conjunction with the $remote_addr parameter for load balancing. In this case, the request URI ($request_uri) is used to calculate a hash value along with the client IP address. This allows for more granular load balancing based on the specific URI being requested.
+    # nginx.ingress.kubernetes.io/upstream-hash-by-subset-size: "3"
+    # nginx.ingress.kubernetes.io/affinity: "false"
+    # nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   proxy_cache off;
+    # nginx.org/websocket-services: nginxhello
+  name: nginxhello-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: websocketpoc.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: websocket-service
+              port:
+                number: 8080
